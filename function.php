@@ -52,6 +52,13 @@ function checkUsername($user) {
 function check() {
     global $error;
     global $CONST;
+    if(isset($_POST["usernamesignup"]) && isset($_POST["anweshasignup"]) && isset($_POST["passwordsignup"]) && isset($_POST['g-recaptcha-response'])){
+
+    } else {
+        $error["msg"] = 'incomplete request';
+        $error['component'] = 'username';
+        return;
+    }
     $user = $_POST["usernamesignup"];
     $anw = $_POST["anweshasignup"];
     $pass = $_POST["passwordsignup"];
@@ -59,11 +66,27 @@ function check() {
     /**
      * validating captcha
      */
-    if(empty($_SESSION['6_letters_code'] ) || $_SESSION['6_letters_code'] != $_POST['6_letters_code']){
+    $ip = $_SERVER["REMOTE_ADDR"];
+    $secret = '6LdrcxUTAAAAAINh2v63loyPIT2CqrNb8Z8uPd7w';
+    $capresp = $_POST['g-recaptcha-response'];
+    $url = 'https://www.google.com/recaptcha/api/siteverify';
+    $response=file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$capresp&remoteip=$ip");
+    if($response.success==false){
         $error["msg"] = "The captcha code does not match!";
         $error["component"] = "captcha";
         return;
     }
+    // $data = array ('secret' => $secret,'response' => $cap_resp, 'remoteip' => $ip);
+    // $data = http_build_query($data);
+    // $reply = do_post_request($url, $data);
+
+    // $res = (array)json_decode($reply);
+
+    // if(empty($_SESSION['6_letters_code'] ) || $_SESSION['6_letters_code'] != $_POST['6_letters_code']){
+    //     $error["msg"] = "The captcha code does not match!";
+    //     $error["component"] = "captcha";
+    //     return;
+    // }
 
     /**
      * getting the status of login in anwesha website
